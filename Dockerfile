@@ -33,14 +33,21 @@ RUN echo 'server {' > /etc/nginx/conf.d/bentopdf.conf && \
     echo '    }' >> /etc/nginx/conf.d/bentopdf.conf && \
     echo '}' >> /etc/nginx/conf.d/bentopdf.conf
 
-# Configure nginx to run as cloudron user
+# Configure nginx to run as cloudron user and use writable directories
 RUN sed -i 's/user www-data;/user cloudron;/' /etc/nginx/nginx.conf && \
-    sed -i 's/pid \/run\/nginx.pid;/pid \/run\/nginx.pid;\n    daemon off;/' /etc/nginx/nginx.conf
+    # Remove any existing daemon directive to avoid duplicates
+    sed -i '/^[[:space:]]*daemon[[:space:]]/d' /etc/nginx/nginx.conf && \
+    # Add daemon off; right after the pid directive
+    sed -i '/^pid[[:space:]]/a daemon off;' /etc/nginx/nginx.conf && \
+    # Replace /var/log/nginx with /run/logs/nginx for all log paths
+    sed -i 's|/var/log/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
+    # Replace /var/cache/nginx with /run/logs/nginx for temp paths
+    sed -i 's|/var/cache/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
+    # Replace /var/lib/nginx with /run/logs/nginx
+    sed -i 's|/var/lib/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf
 
-# Set proper permissions for directories that need to be writable
-RUN chown -R cloudron:cloudron /run/logs && \
-    mkdir -p /var/log/nginx /var/lib/nginx && \
-    chown -R cloudron:cloudron /var/log/nginx /var/lib/nginx
+# Set proper permissions for writable directories
+RUN chown -R cloudron:cloudron /run/logs
 
 COPY start.sh /app/pkg/
 RUN chmod +x /app/pkg/start.sh
