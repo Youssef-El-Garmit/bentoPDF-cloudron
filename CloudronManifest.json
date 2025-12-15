@@ -12,12 +12,9 @@
   "httpPort": 8080,
   "icon": "file://logo.png",
   "addons": {
-    "localstorage": {},
-    "oidc": {
-      "loginRedirectUri": "/oauth/openid/callback"
-    }
+    "localstorage": {}
   },
-  "optionalSso": true,
+  "optionalSso": false,
   "memoryLimit": 268435456,
   "mediaLinks": [
     "https://screenshots.cloudron.io/bentopdf.alam00000.cloudronapp/bentopdf-home.png"
