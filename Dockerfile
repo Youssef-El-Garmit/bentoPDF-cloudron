@@ -18,12 +18,20 @@ RUN mkdir -p /app/pkg /app/code /run/logs
 # Copy bentopdf files from the official image with proper ownership
 COPY --from=bentopdf-base --chown=cloudron:cloudron /usr/share/nginx/html /app/code
 
-# Configure nginx for Cloudron - use custom config files for better maintainability
+# Configure nginx for Cloudron
 RUN rm -f /etc/nginx/sites-enabled/default && \
-    mkdir -p /etc/nginx/conf.d
+    mkdir -p /etc/nginx/conf.d && \
+    # Configure nginx to run as cloudron user
+    sed -i 's/user www-data;/user cloudron;/' /etc/nginx/nginx.conf && \
+    # Set daemon off (remove existing if present to avoid duplicates)
+    sed -i '/^[[:space:]]*daemon[[:space:]]/d' /etc/nginx/nginx.conf && \
+    sed -i '/^pid[[:space:]]/a daemon off;' /etc/nginx/nginx.conf && \
+    # Use writable paths for logs and temp files
+    sed -i 's|/var/log/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
+    sed -i 's|/var/cache/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
+    sed -i 's|/var/lib/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf
 
-# Copy custom nginx configuration files
-COPY --chown=root:root nginx.conf /etc/nginx/nginx.conf
+# Copy server configuration
 COPY --chown=root:root nginx-bentopdf.conf /etc/nginx/conf.d/bentopdf.conf
 
 # Set proper permissions for writable directories
