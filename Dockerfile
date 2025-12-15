@@ -18,33 +18,13 @@ RUN mkdir -p /app/pkg /app/code /run/logs
 # Copy bentopdf files from the official image with proper ownership
 COPY --from=bentopdf-base --chown=cloudron:cloudron /usr/share/nginx/html /app/code
 
-# Configure nginx for Cloudron
+# Configure nginx for Cloudron - use custom config files for better maintainability
 RUN rm -f /etc/nginx/sites-enabled/default && \
     mkdir -p /etc/nginx/conf.d
 
-# Create nginx configuration
-RUN echo 'server {' > /etc/nginx/conf.d/bentopdf.conf && \
-    echo '    listen 8080;' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '    server_name _;' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '    root /app/code;' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '    index index.html;' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '    location / {' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '    }' >> /etc/nginx/conf.d/bentopdf.conf && \
-    echo '}' >> /etc/nginx/conf.d/bentopdf.conf
-
-# Configure nginx to run as cloudron user and use writable directories
-RUN sed -i 's/user www-data;/user cloudron;/' /etc/nginx/nginx.conf && \
-    # Remove any existing daemon directive to avoid duplicates
-    sed -i '/^[[:space:]]*daemon[[:space:]]/d' /etc/nginx/nginx.conf && \
-    # Add daemon off; right after the pid directive
-    sed -i '/^pid[[:space:]]/a daemon off;' /etc/nginx/nginx.conf && \
-    # Replace /var/log/nginx with /run/logs/nginx for all log paths
-    sed -i 's|/var/log/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
-    # Replace /var/cache/nginx with /run/logs/nginx for temp paths
-    sed -i 's|/var/cache/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
-    # Replace /var/lib/nginx with /run/logs/nginx
-    sed -i 's|/var/lib/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf
+# Copy custom nginx configuration files
+COPY --chown=root:root nginx.conf /etc/nginx/nginx.conf
+COPY --chown=root:root nginx-bentopdf.conf /etc/nginx/conf.d/bentopdf.conf
 
 # Set proper permissions for writable directories
 RUN chown -R cloudron:cloudron /run/logs

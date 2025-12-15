@@ -10,4 +10,4 @@ mkdir -p /run/cloudron-dotconfig /run/cloudron-dotcache /run/logs/nginx
 chown -R cloudron:cloudron /run/logs || true
 
 echo "==> Starting BentoPDF"
-exec /usr/sbin/nginx -g "daemon off;"
+exec /usr/sbin/nginx
