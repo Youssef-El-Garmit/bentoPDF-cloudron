@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "upstreamVersion": "1.11.2",
+  "id": "bentopdf.alam00000.cloudronapp",
+  "title": "BentoPDF",
+  "tagline": "A Privacy First PDF Toolkit",
+  "description": "file://DESCRIPTION.md",
+  "postInstallMessage": "file://POSTINSTALL.md",
+  "contactEmail": "support@cloudron.io",
+  "author": "alam00000",
+  "healthCheckPath": "/",
+  "httpPort": 8080,
+  "icon": "file://logo.png",
+  "addons": {
+    "localstorage": {}
+  },
+  "optionalSso": false,
+  "memoryLimit": 268435456,
+  "mediaLinks": [
+    "https://screenshots.cloudron.io/bentopdf.alam00000.cloudronapp/bentopdf-home.png"
+  ],
+  "forumUrl": "https://forum.cloudron.io",
+  "documentationUrl": "https://github.com/alam00000/bentopdf",
+  "manifestVersion": 2,
+  "changelog": "file://CHANGELOG",
+  "tags": [
+    "tools",
+    "pdf"
+  ],
+  "minBoxVersion": "8.1.0",
+  "website": "https://github.com/alam00000/bentopdf"
+}

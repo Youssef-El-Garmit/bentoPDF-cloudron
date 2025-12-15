@@ -1,0 +1,7 @@
+[1.0.0]
+* Initial version for BentoPDF
+* Converted from Stirling-PDF Cloudron package
+* Uses official bentopdf/bentopdf Docker image
+* Simplified setup - no Java, LibreOffice, or supervisor required
+* All processing happens client-side in the browser
+* Based on BentoPDF v1.11.2

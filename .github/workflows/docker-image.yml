@@ -1,0 +1,55 @@
+name: Build & Push Docker image (on tag or manual)
+
+on:
+  push:
+    tags:
+      - "*"        # runs automatically when a tag is pushed
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Git tag to build (ex: v1.0.0)"
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed to fetch tags
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.tag }}"
+            git checkout "refs/tags/${TAG}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push image
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE_LOWER=$(echo "${IMAGE}" | tr '[:upper:]' '[:lower:]')
+          TAG="${{ steps.tag.outputs.tag }}"
+          echo "Building ${IMAGE_LOWER}:${TAG}"
+          docker build -t "${IMAGE_LOWER}:${TAG}" .
+          docker push "${IMAGE_LOWER}:${TAG}"
+
