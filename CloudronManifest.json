@@ -17,7 +17,7 @@
       "loginRedirectUri": "/oauth/openid/callback"
     }
   },
-  "optionalSso": false,
+  "optionalSso": true,
   "memoryLimit": 268435456,
   "mediaLinks": [
     "https://screenshots.cloudron.io/bentopdf.alam00000.cloudronapp/bentopdf-home.png"
