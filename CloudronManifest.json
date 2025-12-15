@@ -12,7 +12,10 @@
   "httpPort": 8080,
   "icon": "file://logo.png",
   "addons": {
-    "localstorage": {}
+    "localstorage": {},
+    "oidc": {
+      "loginRedirectUri": "/oauth/openid/callback"
+    }
   },
   "optionalSso": false,
   "memoryLimit": 268435456,
