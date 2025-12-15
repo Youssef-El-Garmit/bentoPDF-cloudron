@@ -12,11 +12,11 @@ RUN apt-get update && \
     apt-get install -y nginx && \
     rm -rf /var/cache/apt /var/lib/apt/lists
 
-# Copy bentopdf files from the official image
-COPY --from=bentopdf-base /usr/share/nginx/html /app/code
+# Create necessary directories first
+RUN mkdir -p /app/pkg /app/code /run/logs
 
-# Create necessary directories
-RUN mkdir -p /app/pkg /run/logs
+# Copy bentopdf files from the official image with proper ownership
+COPY --from=bentopdf-base --chown=cloudron:cloudron /usr/share/nginx/html /app/code
 
 # Configure nginx for Cloudron
 RUN rm -f /etc/nginx/sites-enabled/default && \
@@ -37,8 +37,10 @@ RUN echo 'server {' > /etc/nginx/conf.d/bentopdf.conf && \
 RUN sed -i 's/user www-data;/user cloudron;/' /etc/nginx/nginx.conf && \
     sed -i 's/pid \/run\/nginx.pid;/pid \/run\/nginx.pid;\n    daemon off;/' /etc/nginx/nginx.conf
 
-# Set proper permissions
-RUN chown -R cloudron:cloudron /app/code /run/logs /var/log/nginx /var/lib/nginx
+# Set proper permissions for directories that need to be writable
+RUN chown -R cloudron:cloudron /run/logs && \
+    mkdir -p /var/log/nginx /var/lib/nginx && \
+    chown -R cloudron:cloudron /var/log/nginx /var/lib/nginx
 
 COPY start.sh /app/pkg/
 RUN chmod +x /app/pkg/start.sh
