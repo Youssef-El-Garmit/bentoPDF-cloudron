@@ -26,10 +26,12 @@ RUN rm -f /etc/nginx/sites-enabled/default && \
     # Set daemon off (remove existing if present to avoid duplicates)
     sed -i '/^[[:space:]]*daemon[[:space:]]/d' /etc/nginx/nginx.conf && \
     sed -i '/^pid[[:space:]]/a daemon off;' /etc/nginx/nginx.conf && \
-    # Use writable paths for logs and temp files
+    # Use writable paths for logs and temp files (replace all occurrences)
     sed -i 's|/var/log/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
     sed -i 's|/var/cache/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
-    sed -i 's|/var/lib/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf
+    sed -i 's|/var/lib/nginx|/run/logs/nginx|g' /etc/nginx/nginx.conf && \
+    # Add explicit client_body_path in http block to override defaults
+    sed -i '/^http {/a\    client_body_temp_path /run/logs/nginx/client_temp;\n    proxy_temp_path /run/logs/nginx/proxy_temp;\n    fastcgi_temp_path /run/logs/nginx/fastcgi_temp;\n    uwsgi_temp_path /run/logs/nginx/uwsgi_temp;\n    scgi_temp_path /run/logs/nginx/scgi_temp;' /etc/nginx/nginx.conf
 
 # Copy server configuration
 COPY --chown=root:root nginx-bentopdf.conf /etc/nginx/conf.d/bentopdf.conf
