@@ -17,6 +17,7 @@ RUN mkdir -p /app/pkg /app/code /run/logs
 
 # Copy bentopdf files from the official image with proper ownership
 COPY --from=bentopdf-base --chown=cloudron:cloudron /usr/share/nginx/html /app/code
+RUN sed -i "s/bentopdf-v6/bentopdf-v7/" /app/code/sw.js
 
 # Configure nginx for Cloudron
 RUN rm -f /etc/nginx/sites-enabled/default && \
