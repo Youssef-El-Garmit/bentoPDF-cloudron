@@ -1,6 +1,5 @@
 # renovate: datasource=docker depName=bentopdf/bentopdf versioning=semver
 ARG BENTOPDF_VERSION=latest
-LABEL org.opencontainers.image.version="1.1.2"
 
 # Use official bentopdf image as base to copy files
 FROM bentopdf/bentopdf:${BENTOPDF_VERSION} as bentopdf-base
